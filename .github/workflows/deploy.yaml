@@ -2,54 +2,32 @@ name: Dynamic Deploy to GitHub Pages
 
 on:
   repository_dispatch:
-    types: [dynamic_deploy]  # Bisa dipicu dari API eksternal
+    types: [dynamic_deploy]  # Bisa dikirim dari API eksternal
   workflow_dispatch:  # Bisa dijalankan manual
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4  # Update ke versi terbaru
 
-      - name: Cek index.html
-        run: |
-          if [ ! -f index.html ]; then
-            echo "🚨 ERROR: index.html tidak ditemukan! Pastikan file ada di root repository."
-            exit 1
-          else
-            echo "✅ index.html ditemukan!"
-          fi
+      - name: Setup Pages
+        uses: actions/configure-pages@v4  # Update ke versi terbaru
 
-      - name: Setup GitHub Pages
-        uses: actions/configure-pages@v4
-
-      - name: Cache Dependencies (Opsional)
+      - name: Cache Dependencies
         uses: actions/cache@v3
         with:
           path: |
-            ~/.npm
             ~/.cache
-          key: cache-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            cache-${{ runner.os }}-
+          key: ${{ runner.os }}-cache
+          restore-keys: ${{ runner.os }}-cache
 
-      - name: Upload Semua File ke Pages
-        uses: actions/upload-pages-artifact@v2
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v2  # Update ke versi terbaru
         with:
-          path: .  # Upload semua file dari root repo
+          path: .  # Gunakan root repository jika HTML ada di root
 
-      - name: Deploy ke GitHub Pages
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
-
-      - name: Tampilkan URL Website
-        if: success()
-        run: |
-          echo "🚀 Deployment sukses! Website dapat diakses di:"
-          echo "🔗 ${{ steps.deployment.outputs.page_url }}"
-
-      - name: Beri Tahu Jika Gagal
-        if: failure()
-        run: echo "❌ Deployment gagal, cek error di log."
