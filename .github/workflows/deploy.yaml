@@ -2,7 +2,7 @@ name: Dynamic Deploy to GitHub Pages
 
 on:
   repository_dispatch:
-    types: [dynamic_deploy]  # Bisa dikirim dari API eksternal
+    types: [dynamic_deploy]  # Bisa dijalankan dari API eksternal
   workflow_dispatch:  # Bisa dijalankan manual
 
 jobs:
@@ -10,23 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4  # Update ke versi terbaru
+        uses: actions/checkout@v4
 
       - name: Setup Pages
-        uses: actions/configure-pages@v4  # Update ke versi terbaru
-
-      - name: Cache Dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache
-          key: ${{ runner.os }}-cache
-          restore-keys: ${{ runner.os }}-cache
+        uses: actions/configure-pages@v4
 
       - name: Upload Artifact
-        uses: actions/upload-pages-artifact@v2  # Update ke versi terbaru
+        uses: actions/upload-artifact@v4  # ✅ Sudah diperbarui dari v3 ke v4
         with:
-          path: .  # Gunakan root repository jika HTML ada di root
+          name: github-pages
+          path: .  # Sesuaikan jika perlu
 
       - name: Deploy to GitHub Pages
         id: deployment
