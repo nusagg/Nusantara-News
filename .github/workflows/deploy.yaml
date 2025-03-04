@@ -1,0 +1,55 @@
+name: Dynamic Deploy to GitHub Pages
+
+on:
+  repository_dispatch:
+    types: [dynamic_deploy]  # Bisa dipicu dari API eksternal
+  workflow_dispatch:  # Bisa dijalankan manual
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Cek index.html
+        run: |
+          if [ ! -f index.html ]; then
+            echo "🚨 ERROR: index.html tidak ditemukan! Pastikan file ada di root repository."
+            exit 1
+          else
+            echo "✅ index.html ditemukan!"
+          fi
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Cache Dependencies (Opsional)
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            ~/.cache
+          key: cache-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            cache-${{ runner.os }}-
+
+      - name: Upload Semua File ke Pages
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: .  # Upload semua file dari root repo
+
+      - name: Deploy ke GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+
+      - name: Tampilkan URL Website
+        if: success()
+        run: |
+          echo "🚀 Deployment sukses! Website dapat diakses di:"
+          echo "🔗 ${{ steps.deployment.outputs.page_url }}"
+
+      - name: Beri Tahu Jika Gagal
+        if: failure()
+        run: echo "❌ Deployment gagal, cek error di log."
