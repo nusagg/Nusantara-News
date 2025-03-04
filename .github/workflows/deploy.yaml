@@ -2,8 +2,16 @@ name: Dynamic Deploy to GitHub Pages
 
 on:
   repository_dispatch:
-    types: [dynamic_deploy]  # Bisa dijalankan dari API eksternal
+    types: [dynamic_deploy]  # Bisa dipicu dari API eksternal
+  push:
+    branches:
+      - main  # Deploy otomatis setiap kali ada perubahan di branch utama
   workflow_dispatch:  # Bisa dijalankan manual
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   deploy:
@@ -15,12 +23,20 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
+      - name: Build and Prepare Files
+        run: |
+          mkdir -p ./public
+          cp -r * ./public  # Salin semua file ke folder public
+          echo "Deploying files to GitHub Pages..."
+
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4  # ✅ Sudah diperbarui dari v3 ke v4
+        uses: actions/upload-pages-artifact@v2  # ✅ Sudah versi terbaru
         with:
-          name: github-pages
-          path: .  # Sesuaikan jika perlu
+          path: ./public  # Upload isi folder public
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
+
+      - name: Deployment Success
+        run: echo "🎉 Deployment ke GitHub Pages Berhasil!"
