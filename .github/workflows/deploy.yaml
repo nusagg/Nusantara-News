@@ -23,13 +23,13 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Build and Prepare Files
+      - name: Prepare Deployment Files
         run: |
           mkdir -p ./public
           cp -r * ./public  # Salin semua file ke folder public
-          echo "Deploying files to GitHub Pages..."
+          echo "✔️ Semua file telah disiapkan untuk deployment."
 
-      - name: Upload Artifact
+      - name: Upload Artifact to GitHub Pages
         uses: actions/upload-pages-artifact@v2  # ✅ Sudah versi terbaru
         with:
           path: ./public  # Upload isi folder public
@@ -38,5 +38,5 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v2
 
-      - name: Deployment Success
+      - name: Deployment Success Message
         run: echo "🎉 Deployment ke GitHub Pages Berhasil!"
